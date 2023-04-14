@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.room.Room
 import kotlinx.coroutines.*
@@ -21,18 +22,25 @@ class SearchMeal : AppCompatActivity() {
         search.setOnClickListener {
             var stb = StringBuilder()
             val input = findViewById<EditText>(R.id.inputText).text.toString()
-            //if(recipeDao.E)
-            runBlocking {
-                launch {
-                    withContext(Dispatchers.IO) {
+            if (input != ""){
+                runBlocking {
+                    launch {
+                        withContext(Dispatchers.IO) {
 
-                        val recipes: List<Recipe> = recipeDao.getRecipe(input)
-                        for (r in recipes) {
-                            stb.append("\n ${r.meal}\n ${r.drinkAlternate}\n ${r.category} \n ${r.area}\n ${r.instructions}\n${r.mealThumb}\n${r.tags}\n${r.youtube}\n")
+                            val recipes: List<Recipe> = recipeDao.getRecipe(input)
+                            for (r in recipes) {
+                                stb.append("\n ${r.meal}\n ${r.drinkAlternate}\n ${r.category} \n ${r.area}\n ${r.instructions}\n${r.mealThumb}\n${r.tags}\n${r.youtube}\n")
+                            }
                         }
                     }
                 }
             }
+            else{
+                Toast.makeText(this, "Type something to search", Toast.LENGTH_SHORT).show()
+
+            }
+            //if(recipeDao.E)
+
             runOnUiThread {
                 //updates the UI
                 tv1.text = stb

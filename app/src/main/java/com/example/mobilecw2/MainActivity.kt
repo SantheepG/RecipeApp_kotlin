@@ -21,8 +21,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         val db = Room.databaseBuilder(this, AppDatabase::class.java, "DB5").build()
         val recipeDao = db.recipeDao()
+        val searchIngredient = findViewById<Button>(R.id.ingredientSearch)
+        searchIngredient.setOnClickListener {
+            val contactIntent = Intent(this, SearchIngredient::class.java)
+            startActivity(contactIntent)
+        }
         val searchMeals = findViewById<Button>(R.id.mealSearch)
-
         searchMeals.setOnClickListener {
             runBlocking {
                 launch {
@@ -94,7 +98,4 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show()
             }
         }
-    fun countCheck(){
-
-    }
 }

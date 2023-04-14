@@ -5,10 +5,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.BufferedReader
@@ -17,52 +14,77 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 class SearchIngredient: AppCompatActivity() {
-    lateinit var tv:TextView
+
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_searchingredient)
 
         val retrieveBtn = findViewById<Button>(R.id.retrieveBtn)
         val save = findViewById<Button>(R.id.saveMeals)
-
+        val tv = findViewById<TextView>(R.id.tv)
         // collecting all the JSON string
-        var stb = StringBuilder()
-        var url_string = "https://www.themealdb.com/api/json/v1/1/search.php?s=Arrabita"
-        val url = URL(url_string)
-        var con: HttpURLConnection = url.openConnection() as HttpURLConnection
+
+        //var url_string = "https://www.themealdb.com/api/json/v1/1/filter.php?i="
+        val stb = StringBuilder()
+        val stb1 = StringBuilder()
+        //var con: HttpURLConnection = url.openConnection() as HttpURLConnection
         retrieveBtn.setOnClickListener {
-            val input = findViewById<EditText>(R.id.input).text.toString()
-            url_string += input
-            runBlocking {
-                launch {
-// run the code of the coroutine in a new thread
-                    withContext(Dispatchers.IO) {
-                        var bf = BufferedReader(InputStreamReader(con.inputStream))
-                        var line: String? = bf.readLine()
-                        while (line != null) {
-                            stb.append(line + "\n")
-                            line = bf.readLine()
-                        }
-                        parseJSON(stb)
-                    }
+            stb.clear()
+            GlobalScope.launch(Dispatchers.IO) {
+                val input_text = findViewById<EditText>(R.id.input).text.toString()
+                var url_string = "https://www.themealdb.com/api/json/v1/1/filter.php?i=$input_text"
+                val url = URL(url_string)
+                val con: HttpURLConnection = url.openConnection() as HttpURLConnection
+                val bf = BufferedReader(InputStreamReader(con.inputStream))
+                var line: String? = bf.readLine()
+                //val stb = StringBuilder()
+                while (line != null) {
+                    stb.append(line + "\n")
+                    line = bf.readLine()
+                }
+                withContext(Dispatchers.Main) {
+                    parseJSON(stb,stb1,tv)
                 }
             }
+            
         }
 
     }
-    suspend fun parseJSON(stb: java.lang.StringBuilder) {
-// this contains the full JSON returned by the Web Service
-        val json = JSONObject(stb.toString())
-// Information about all the books extracted by this function
-        var allMeals = java.lang.StringBuilder()
+    suspend fun parseJSON(stb: java.lang.StringBuilder,stb1: java.lang.StringBuilder,tv:TextView) {
+        var json = JSONObject(stb.toString())
+        var mealsID = mutableListOf<Int>()
         var jsonArray: JSONArray = json.getJSONArray("meals")
-// extract all the books from the JSON array
+
         for (i in 0..jsonArray.length()-1) {
             val meal: JSONObject = jsonArray[i] as JSONObject // this is a json object
-// extract the title
-            val strMeal = meal["strMeal"] as String
-            val strCategory = meal["strCategory"] as String
-            allMeals.append("${i+1}. $strMeal - $strCategory ")
+            val mealID = meal["idMeal"] as String
+            mealsID.add(mealID.toInt())
+        }
+        for(i in 0..mealsID.size-1){
+            GlobalScope.launch (Dispatchers.IO) {
+                var url_string2 = "www.themealdb.com/api/json/v1/1/lookup.php?i=${mealsID.get(i)}"
+                val url = URL(url_string2)
+                val con: HttpURLConnection = url.openConnection() as HttpURLConnection
+                val bf = BufferedReader(InputStreamReader(con.inputStream))
+                var line: String? = bf.readLine()
+                while (line != null) {
+                    stb1.append(line + "\n")
+                    line = bf.readLine()
+                }
+            }
+        }
+        //GlobalScope.launch (Dispatchers.IO){
+            //var url_string2 = "www.themealdb.com/api/json/v1/1/lookup.php?i=52772$input_text"
+
+        //}
+// this contains the full JSON returned by the Web Service
+
+// Information about all the books extracted by this function
+
+
+// extract all the books from the JSON array
+
 
             //val volInfo = book["volumeInfo"] as JSONObject
             //val title = volInfo["title"] as String
@@ -73,9 +95,9 @@ class SearchIngredient: AppCompatActivity() {
             //for (i in 0..authors.length()-1)
             //    allBooks.append(authors[i] as String + ", ")
             //allBooks.append("\n\n")
-        }
+
         runOnUiThread {
-            tv.text = allMeals
+            tv.text = mealsID.toString()
             // Stuff that updates the UI
         }
 

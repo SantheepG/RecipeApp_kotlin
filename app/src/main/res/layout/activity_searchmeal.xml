@@ -12,26 +12,26 @@
         android:id="@+id/inputText"
         android:layout_width="206dp"
         android:layout_height="43dp"
-        android:hint="\t\t\t\t\t\t\t\tEnter here"
+
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.18"
+        app:layout_constraintHorizontal_bias="0.204"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.952" />
+        app:layout_constraintVertical_bias="0.944" />
 
     <Button
         android:id="@+id/searchButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Search"
+        android:layout_width="112dp"
+        android:layout_height="42dp"
+        android:text="@string/search"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.842"
+        app:layout_constraintHorizontal_bias="0.876"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.959" />
+        app:layout_constraintVertical_bias="0.944" />
 
     <ScrollView
         android:id="@+id/scrollView"

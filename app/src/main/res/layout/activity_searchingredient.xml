@@ -9,50 +9,50 @@
 
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/input"
-        android:layout_width="258dp"
+        android:layout_width="195dp"
         android:layout_height="49dp"
-        android:hint="\t\t\t\t\t\t\t\t\t\tEnter here"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.418"
+        app:layout_constraintHorizontal_bias="0.069"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.847" />
+        app:layout_constraintVertical_bias="0.023" />
 
     <Button
         android:id="@+id/retrieveBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="108dp"
+        android:layout_height="49dp"
         android:text="Retrieve"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.173"
+        app:layout_constraintHorizontal_bias="0.732"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.938" />
+        app:layout_constraintVertical_bias="0.023" />
 
-    <Button
+    <ImageButton
         android:id="@+id/saveMeals"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="50dp"
+        android:layout_height="49dp"
+        android:background="@drawable/save"
         android:text="Save meals"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.719"
+        app:layout_constraintHorizontal_bias="0.955"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.938" />
+        app:layout_constraintVertical_bias="0.023" />
 
     <ScrollView
-        android:layout_width="376dp"
-        android:layout_height="442dp"
+        android:layout_width="382dp"
+        android:layout_height="496dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.457"
+        app:layout_constraintHorizontal_bias="0.551"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.391">
+        app:layout_constraintVertical_bias="0.748">
 
         <TextView
             android:id="@+id/tv"

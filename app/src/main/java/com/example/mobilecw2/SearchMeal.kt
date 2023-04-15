@@ -21,37 +21,27 @@ class SearchMeal : AppCompatActivity() {
         val linearLayout = LinearLayout(this)
         linearLayout.orientation = LinearLayout.VERTICAL
 
-
-        //var tv1 = findViewById<TextView>(R.id.tv1)
         val db = Room.databaseBuilder(this, AppDatabase::class.java, "DB8").build()
         val recipeDao = db.recipeDao()
         val search = findViewById<Button>(R.id.searchButton)
         search.setOnClickListener {
             linearLayout.removeAllViews()
             scrollView.removeAllViews()
-            //var stb = StringBuilder()
             val input = findViewById<EditText>(R.id.inputText).text.toString()
             if (input != ""){
                 runBlocking {
                     withContext(Dispatchers.IO) {
                         val recipes: List<Recipe> = recipeDao.getRecipe(input)
                         updateUI(recipes,linearLayout)
-                        //for (r in recipes) {
-                            //val imageView = ImageView(this)
-
-                        //    stb.append("\n ${r.meal}\n ${r.drinkAlternate}\n ${r.category} \n ${r.area}\n ${r.instructions}\n${r.mealThumb}\n${r.tags}\n${r.youtube}\n")
-                       // }
                     }
                 }
             }
-
-            //runOnUiThread {
             scrollView.addView(linearLayout)
-            //tv1.text = stb
-            //}
         }
     }
-    suspend fun updateUI(recipe: List<Recipe>,linearLayout: LinearLayout,){
+
+
+    suspend fun updateUI(recipe: List<Recipe>, linearLayout: LinearLayout,){
         for(r in recipe){
             val mealThumb = ImageView(this)
             val mealName = TextView(this)

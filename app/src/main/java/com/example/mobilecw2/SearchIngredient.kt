@@ -1,10 +1,7 @@
 package com.example.mobilecw2
 
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.room.Room
 import kotlinx.coroutines.*
@@ -25,7 +22,7 @@ class SearchIngredient: AppCompatActivity() {
         setContentView(R.layout.activity_searchingredient)
 
         val retrieveBtn = findViewById<Button>(R.id.retrieveBtn)
-        val save = findViewById<Button>(R.id.saveMeals)
+        val save = findViewById<ImageButton>(R.id.saveMeals)
         val tv = findViewById<TextView>(R.id.tv)
         // collecting all the JSON string
 
@@ -34,11 +31,13 @@ class SearchIngredient: AppCompatActivity() {
         val stb = StringBuilder() // for meal id
         val stb1 = StringBuilder()// for meals.
         val stb2 = StringBuilder()
-
+        val temp = StringBuilder()
         var mealsID = mutableListOf<Int>()
         //var con: HttpURLConnection = url.openConnection() as HttpURLConnection
         retrieveBtn.setOnClickListener {
             stb.clear()
+            stb2.clear()
+            stb2.append("{ \"meals\":[")
             val allMeals = StringBuilder()
             mealsID.clear()
             //allMeals.clear()
@@ -49,7 +48,7 @@ class SearchIngredient: AppCompatActivity() {
                 val con: HttpURLConnection = url.openConnection() as HttpURLConnection
                 val bf = BufferedReader(InputStreamReader(con.inputStream))
                 var line: String? = bf.readLine()
-                val stb = StringBuilder()
+
                 while (line != null) {
                     stb.append(line + "\n")
                     line = bf.readLine()
@@ -59,6 +58,7 @@ class SearchIngredient: AppCompatActivity() {
 
                 for (i in 0..mealsID.size - 1) {
                     stb1.clear()
+                    temp.clear()
                     var url_string2 = "https://www.themealdb.com/api/json/v1/1/lookup.php?i=${mealsID[i]}"
                     val url = URL(url_string2)
                     val con: HttpURLConnection = url.openConnection() as HttpURLConnection
@@ -66,14 +66,30 @@ class SearchIngredient: AppCompatActivity() {
                     var line: String? = bf.readLine()
                     while (line != null) {
                        stb1.append(line + "\n")
+                        temp.append(line + "\n")
+                        //stb2.append(line + "\n")
                        line = bf.readLine()
                         }
-                    parseMeal(stb1,allMeals,tv)
+                    temp.delete(0,10)
+                    //temp.deleteCharAt(temp.length)
+                    temp.deleteCharAt(temp.length-1)
+                    temp.deleteCharAt(temp.length-1)
+                    temp.deleteCharAt(temp.length-1)
+                    //temp.deleteCharAt(temp.length-4)
+                    temp.append(",")
+                    stb2.append(temp)
+                    //parseMeal(stb1,allMeals,tv)
                     }
+                stb2.deleteCharAt(stb2.length -1)
+                stb2.append("]}")
+                //parseMeal(stb2,allMeals,tv)
                 //tv.text = stb1.toString()
 
                 runOnUiThread {
-                    tv.text = allMeals
+                    //val json = JSONObject(stb2.toString())
+                    //val allMeals = java.lang.StringBuilder()
+                    //val jsonArray: JSONArray = json.getJSONArray("allMeals")
+                    tv.text = stb2.toString()
                     //Stuff that updates the UI
                 }
                 //runOnUiThread {
@@ -86,7 +102,7 @@ class SearchIngredient: AppCompatActivity() {
         save.setOnClickListener {
             if(stb1.isNotEmpty()){
                 GlobalScope.launch(Dispatchers.IO){
-                    saveMeal(stb1)
+                    saveMeal(stb2,tv)
                 }
             }
         }
@@ -166,24 +182,23 @@ class SearchIngredient: AppCompatActivity() {
 
     }
 
-    suspend fun saveMeal(stb1: java.lang.StringBuilder){
+    suspend fun saveMeal(stb2: java.lang.StringBuilder, tv: TextView){
         val db = Room.databaseBuilder(this, AppDatabase::class.java, "DB8").build()
         val recipeDao = db.recipeDao()
-        val json = JSONObject(stb1.toString())
-        //val allMeals = java.lang.StringBuilder()
+        val json = JSONObject(stb2.toString())
         val jsonArray: JSONArray = json.getJSONArray("meals")
         //val jsonObject = jsonArray.getJSONObject(0)
         for (i in 0..jsonArray.length()-1) {
             val meal: JSONObject = jsonArray[i] as JSONObject // this is a json object
-            val idMeal = meal["idMeal"].toString().toInt()
-            val strMeal = meal["strMeal"].toString()
-            val drinkAlt = meal["strDrinkAlternate"].toString()
-            val category = meal["strCategory"].toString()
-            val area = meal["strArea"].toString()
-            val instructions = meal["strInstructions"].toString()
-            val mealThumb = meal["strMealThumb"].toString()
-            val tags = meal["strTags"].toString()
-            val youtube = meal["strYoutube"].toString()
+            val idMeal = meal["idMeal"]
+            val strMeal = meal["strMeal"]
+            val drinkAlt = meal["strDrinkAlternate"]
+            val category = meal["strCategory"]
+            val area = meal["strArea"]
+            val instructions = meal["strInstructions"]
+            val mealThumb = meal["strMealThumb"]
+            val tags = meal["strTags"]
+            val youtube = meal["strYoutube"]
             val ingredients = mutableListOf<String>()
             val measures = mutableListOf<String>()
             //ingredients.add(jsonObject.toString())
@@ -197,13 +212,6 @@ class SearchIngredient: AppCompatActivity() {
                     measures.add(meal.getString(key))
                 }
             }
-            val src = meal["strSource"].toString()
-            val imgSrc = meal["strImageSource"].toString()
-            val creativeCommons = meal["strCreativeCommonsConfirmed"].toString()
-            val dateModified = meal ["dateModified"].toString()
-
-            val recipe = Recipe(id=idMeal,meal=strMeal, drinkAlternate = drinkAlt,category=category,area=area,instructions=instructions, mealThumb = mealThumb,tags=tags, youtube = youtube,ingredients=ingredients,measures=measures, src = src, imgSrc = imgSrc, CreativeCommonsConfirmed = creativeCommons, dateModified = dateModified)
-            recipeDao.insertRecipe(recipe)
         }
 
     }

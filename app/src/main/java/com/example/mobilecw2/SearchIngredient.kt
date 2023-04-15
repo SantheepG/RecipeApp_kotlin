@@ -6,6 +6,7 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.room.Room
 import kotlinx.coroutines.*
 import org.json.JSONArray
 import org.json.JSONObject
@@ -28,9 +29,11 @@ class SearchIngredient: AppCompatActivity() {
         val tv = findViewById<TextView>(R.id.tv)
         // collecting all the JSON string
 
+
         //var url_string = "https://www.themealdb.com/api/json/v1/1/filter.php?i="
         val stb = StringBuilder() // for meal id
         val stb1 = StringBuilder()// for meals.
+        val stb2 = StringBuilder()
 
         var mealsID = mutableListOf<Int>()
         //var con: HttpURLConnection = url.openConnection() as HttpURLConnection
@@ -80,6 +83,13 @@ class SearchIngredient: AppCompatActivity() {
             }
             Toast.makeText(this, "Type something to search", Toast.LENGTH_SHORT).show()
         }
+        save.setOnClickListener {
+            if(stb1.isNotEmpty()){
+                GlobalScope.launch(Dispatchers.IO){
+                    saveMeal(stb1)
+                }
+            }
+        }
     }
 
 
@@ -112,6 +122,7 @@ class SearchIngredient: AppCompatActivity() {
             val tags = meal["strTags"]
             val youtube = meal["strYoutube"]
             val ingredients = mutableListOf<String>()
+            val measures = mutableListOf<String>()
             //ingredients.add(jsonObject.toString())
             val keysIterator = meal.keys()
             while (keysIterator.hasNext()){
@@ -120,7 +131,12 @@ class SearchIngredient: AppCompatActivity() {
                 if (key.startsWith("strIngredient")){
                     ingredients.add(meal.getString(key))
                 }
+                else if(key.startsWith("strMeasure")){
+                    measures.add(meal.getString(key))
+                }
             }
+
+
             //for (i in 0 until jsonObject.length()){
             //    if (keysIterator != null) {
             //        if (keysIterator.startsWith("Ingredient")){
@@ -144,8 +160,50 @@ class SearchIngredient: AppCompatActivity() {
              //   }
 
             //val ing1 = meal["strIngredient1"]
-            allMeals.append("\"$strMeal\" \n\t\t\t\t \"$ingredients \n")
+            allMeals.append("\"$strMeal\" \n\t\t\t\t \"$ingredients \n\t\t\t\t \"$measures\n")
             //allMeals.append("${i+1}). \"$strMeal\"\n\t \"$drinkAlt\"\n\t \"$category\"\n\t \"$area\"\n\t \"$instructions\"\n\n")
+        }
+
+    }
+
+    suspend fun saveMeal(stb1: java.lang.StringBuilder){
+        val db = Room.databaseBuilder(this, AppDatabase::class.java, "DB8").build()
+        val recipeDao = db.recipeDao()
+        val json = JSONObject(stb1.toString())
+        //val allMeals = java.lang.StringBuilder()
+        val jsonArray: JSONArray = json.getJSONArray("meals")
+        //val jsonObject = jsonArray.getJSONObject(0)
+        for (i in 0..jsonArray.length()-1) {
+            val meal: JSONObject = jsonArray[i] as JSONObject // this is a json object
+            val idMeal = meal["idMeal"].toString().toInt()
+            val strMeal = meal["strMeal"].toString()
+            val drinkAlt = meal["strDrinkAlternate"].toString()
+            val category = meal["strCategory"].toString()
+            val area = meal["strArea"].toString()
+            val instructions = meal["strInstructions"].toString()
+            val mealThumb = meal["strMealThumb"].toString()
+            val tags = meal["strTags"].toString()
+            val youtube = meal["strYoutube"].toString()
+            val ingredients = mutableListOf<String>()
+            val measures = mutableListOf<String>()
+            //ingredients.add(jsonObject.toString())
+            val keysIterator = meal.keys()
+            while (keysIterator.hasNext()) {
+                val key = keysIterator.next()
+                //ingredients.add(key)
+                if (key.startsWith("strIngredient")) {
+                    ingredients.add(meal.getString(key))
+                } else if (key.startsWith("strMeasure")) {
+                    measures.add(meal.getString(key))
+                }
+            }
+            val src = meal["strSource"].toString()
+            val imgSrc = meal["strImageSource"].toString()
+            val creativeCommons = meal["strCreativeCommonsConfirmed"].toString()
+            val dateModified = meal ["dateModified"].toString()
+
+            val recipe = Recipe(id=idMeal,meal=strMeal, drinkAlternate = drinkAlt,category=category,area=area,instructions=instructions, mealThumb = mealThumb,tags=tags, youtube = youtube,ingredients=ingredients,measures=measures, src = src, imgSrc = imgSrc, CreativeCommonsConfirmed = creativeCommons, dateModified = dateModified)
+            recipeDao.insertRecipe(recipe)
         }
 
     }

@@ -14,9 +14,8 @@ class SearchMeal : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_searchmeal)
 
-
         var tv1 = findViewById<TextView>(R.id.tv1)
-        val db = Room.databaseBuilder(this, AppDatabase::class.java, "DB5").build()
+        val db = Room.databaseBuilder(this, AppDatabase::class.java, "DB8").build()
         val recipeDao = db.recipeDao()
         val search = findViewById<Button>(R.id.searchButton)
         search.setOnClickListener {

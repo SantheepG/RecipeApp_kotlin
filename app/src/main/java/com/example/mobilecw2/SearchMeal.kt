@@ -21,7 +21,7 @@ class SearchMeal : AppCompatActivity() {
         val linearLayout = LinearLayout(this)
         linearLayout.orientation = LinearLayout.VERTICAL
 
-        val db = Room.databaseBuilder(this, AppDatabase::class.java, "DB8").build()
+        val db = Room.databaseBuilder(this, AppDatabase::class.java, "DB10").build()
         val recipeDao = db.recipeDao()
         val search = findViewById<Button>(R.id.searchButton)
         search.setOnClickListener {
@@ -41,7 +41,7 @@ class SearchMeal : AppCompatActivity() {
     }
 
 
-    suspend fun updateUI(recipe: List<Recipe>, linearLayout: LinearLayout,){
+    suspend fun updateUI(recipe: List<Recipe>, linearLayout: LinearLayout){
         for(r in recipe){
             val mealThumb = ImageView(this)
             val mealName = TextView(this)

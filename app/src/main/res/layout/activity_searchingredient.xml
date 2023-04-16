@@ -45,6 +45,7 @@
         app:layout_constraintVertical_bias="0.023" />
 
     <ScrollView
+        android:id="@+id/sv1"
         android:layout_width="382dp"
         android:layout_height="496dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -54,11 +55,5 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.748">
 
-        <TextView
-            android:id="@+id/tv"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:textColor="@color/white" />
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

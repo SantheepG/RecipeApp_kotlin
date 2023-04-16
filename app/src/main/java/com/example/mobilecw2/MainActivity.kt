@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val db = Room.databaseBuilder(this, AppDatabase::class.java, "DB8").build()
+        val db = Room.databaseBuilder(this, AppDatabase::class.java, "DB10").build()
         val recipeDao = db.recipeDao()
         val searchIngredient = findViewById<Button>(R.id.ingredientSearch)
         searchIngredient.setOnClickListener {

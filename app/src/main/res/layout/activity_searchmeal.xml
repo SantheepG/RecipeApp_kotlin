@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:background="#FF118675"
     android:textColor="@color/white"
+
     tools:context=".SearchMeal">
 
     <com.google.android.material.textfield.TextInputEditText
@@ -14,6 +15,7 @@
         android:layout_height="43dp"
 
         android:textColor="@color/white"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.204"

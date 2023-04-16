@@ -1,13 +1,16 @@
 package com.example.mobilecw2
 
-import android.graphics.Color
-import android.graphics.Typeface
+import android.graphics.*
 import android.os.Bundle
 import android.util.TypedValue
+import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.room.Room
 import kotlinx.coroutines.*
+import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.URL
 
 class SearchMeal : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,7 +45,9 @@ class SearchMeal : AppCompatActivity() {
 
 
     suspend fun updateUI(recipe: List<Recipe>, linearLayout: LinearLayout){
+        var count = 0
         for(r in recipe){
+            count++
             val mealThumb = ImageView(this)
             val mealName = TextView(this)
             val desc = TextView(this)
@@ -50,10 +55,37 @@ class SearchMeal : AppCompatActivity() {
             val ingMrs = TextView(this)
             val inst = TextView(this)
             val instructions = TextView(this)
-            mealName.text = r.meal
+            val divider = TextView(this)
+
+            var urlString = "${r.mealThumb}"
+            val url = URL(urlString)
+            val con: HttpURLConnection = url.openConnection() as HttpURLConnection
+            val inputStream: InputStream = con.inputStream
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+
+            // Set the maximum height of the image view to 200 pixels
+            val layoutParams = ViewGroup.LayoutParams(400, 400)
+            mealThumb.layoutParams = layoutParams
+            // create a circular bitmap with the same width and height as the original bitmap
+            val output = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(output)
+            val paint = Paint()
+            val rect = Rect(0, 0, bitmap.width, bitmap.height)
+            val radius = bitmap.width / 2f
+            paint.isAntiAlias = true
+            canvas.drawARGB(0, 0, 100, 88)
+            paint.style = Paint.Style.FILL
+            canvas.drawCircle(radius, radius, radius, paint)
+            paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
+            canvas.drawBitmap(bitmap, rect, rect, paint)
+            mealThumb.setImageBitmap(output)
+
+
+            mealName.text = "\n${count}. ${r.meal}\n"
             mealName.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20F)
             mealName.setTextColor(Color.WHITE)
             mealName.setTypeface(null, Typeface.BOLD)
+
 
             desc.text = "Drink alternate: ${r.drinkAlternate}\nCategory: ${r.category}\nArea: ${r.area}\n\n"
             desc.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15F)
@@ -79,8 +111,11 @@ class SearchMeal : AppCompatActivity() {
             instructions.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15F)
             instructions.setTextColor(Color.WHITE)
 
-            //linearLayout.addView(mealThumb)
+            divider.text = "\t"
+
+            
             linearLayout.addView(mealName)
+            linearLayout.addView(mealThumb)
             linearLayout.addView(ing)
             linearLayout.addView(ingMrs)
             linearLayout.addView(inst)

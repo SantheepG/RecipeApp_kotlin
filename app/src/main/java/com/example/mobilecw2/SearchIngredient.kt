@@ -33,25 +33,22 @@ class SearchIngredient: AppCompatActivity() {
         linearLayout1.orientation = LinearLayout.VERTICAL
         // collecting all the JSON string
 
-
-        //var url_string = "https://www.themealdb.com/api/json/v1/1/filter.php?i="
         val stb = StringBuilder() // for meal id
         val stb1 = StringBuilder()// for meals.
         val stb2 = StringBuilder()
         val temp = StringBuilder()
         var mealsID = mutableListOf<Int>()
 
-        val meals = StringBuilder()
-        //var con: HttpURLConnection = url.openConnection() as HttpURLConnection
+
         retrieveBtn.setOnClickListener {
             linearLayout1.removeAllViews()
             scrollView1.removeAllViews()
             stb.clear()
             stb2.clear()
             stb2.append("{ \"meals\":[")
-            val allMeals = StringBuilder()
+
             mealsID.clear()
-            //allMeals.clear()
+
             runBlocking {
                 withContext(Dispatchers.IO){
                     val input_text = findViewById<EditText>(R.id.input).text.toString()
@@ -79,18 +76,17 @@ class SearchIngredient: AppCompatActivity() {
                         while (line != null) {
                             stb1.append(line + "\n")
                             temp.append(line + "\n")
-                            //stb2.append(line + "\n")
                             line = bf.readLine()
                         }
                         temp.delete(0,10)
-                        //temp.deleteCharAt(temp.length)
+
                         temp.deleteCharAt(temp.length-1)
                         temp.deleteCharAt(temp.length-1)
                         temp.deleteCharAt(temp.length-1)
-                        //temp.deleteCharAt(temp.length-4)
+
                         temp.append(",")
                         stb2.append(temp)
-                        //parseMeal(stb1,allMeals,tv)
+
                     }
                     stb2.deleteCharAt(stb2.length -1)
                     stb2.append("]}")
@@ -127,7 +123,7 @@ class SearchIngredient: AppCompatActivity() {
     suspend fun mealsView(stb2: java.lang.StringBuilder,linearLayout1: LinearLayout){
         val json = JSONObject(stb2.toString())
         val jsonArray: JSONArray = json.getJSONArray("meals")
-        //val jsonObject = jsonArray.getJSONObject(0)
+
         for (i in 0..jsonArray.length()-1) {
             val meal: JSONObject = jsonArray[i] as JSONObject // this is a json object
             val idMeal = meal["idMeal"].toString().toInt()
@@ -207,7 +203,7 @@ class SearchIngredient: AppCompatActivity() {
         val json = JSONObject(stb2.toString())
 
         val jsonArray: JSONArray = json.getJSONArray("meals")
-        //val jsonObject = jsonArray.getJSONObject(0)
+
         for (i in 0..jsonArray.length()-1) {
             val meal: JSONObject = jsonArray[i] as JSONObject // this is a json object
             val idMeal = meal["idMeal"].toString().toInt()
@@ -221,11 +217,9 @@ class SearchIngredient: AppCompatActivity() {
             val youtube = meal["strYoutube"].toString()
             val ingredients = mutableListOf<String>()
             val measures = mutableListOf<String>()
-            //ingredients.add(jsonObject.toString())
             val keysIterator = meal.keys()
             while (keysIterator.hasNext()) {
                 val key = keysIterator.next()
-                //ingredients.add(key)
                 if (key.startsWith("strIngredient")) {
                     ingredients.add(meal.getString(key))
                 } else if (key.startsWith("strMeasure")) {
@@ -237,17 +231,11 @@ class SearchIngredient: AppCompatActivity() {
             val creativeCommonsConfirmed = meal["strCreativeCommonsConfirmed"].toString()
             val dateModified = meal["dateModified"].toString()
 
-            //meals.append("$idMeal\n$strMeal\n$drinkAlt\n$category\n$area\n$instructions\n$mealThumb\n$tags\n$youtube\n$ingredients\n$measures\n$src\n$imgSrc\n$creativeCommonsConfirmed\n$dateModified\n\n")
             val recipe = Recipe(id = idMeal,meal=strMeal, drinkAlternate = drinkAlt,category=category,
                 area = area, instructions = instructions,mealThumb=mealThumb,tags=tags, youtube = youtube,ingredients=ingredients,
                 measures = measures, src = src, imgSrc = imgSrc, CreativeCommonsConfirmed = creativeCommonsConfirmed, dateModified = dateModified)
             recipeDao.insertRecipe(recipe)
         }
-
-        //runOnUiThread {
-        //    tv.text = meals.toString()
-        //}
-
 
     }
 

@@ -4,11 +4,13 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
 import android.util.TypedValue
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.room.Room
 import kotlinx.coroutines.*
 import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -41,69 +43,86 @@ class SearchIngredient: AppCompatActivity() {
 
 
         retrieveBtn.setOnClickListener {
+
             linearLayout1.removeAllViews()
             scrollView1.removeAllViews()
             stb.clear()
             stb2.clear()
             stb2.append("{ \"meals\":[")
-
+            val input_text = findViewById<EditText>(R.id.input).text.toString()
             mealsID.clear()
+            if (input_text.isEmpty()) {
+                Toast.makeText(this,"Type something to search", Toast.LENGTH_SHORT ).show()
+            } else {
+                val progressBar = findViewById<ProgressBar>(R.id.progressBar)
+                progressBar.visibility = View.VISIBLE // show the progress bar
+                GlobalScope.launch(Dispatchers.Main) {
+                    try{
+                    withContext(Dispatchers.IO) {
 
-            runBlocking {
-                withContext(Dispatchers.IO){
-                    val input_text = findViewById<EditText>(R.id.input).text.toString()
-                    val url_string = "https://www.themealdb.com/api/json/v1/1/filter.php?i=$input_text"
-                    val url = URL(url_string)
-                    val con: HttpURLConnection = url.openConnection() as HttpURLConnection
-                    val bf = BufferedReader(InputStreamReader(con.inputStream))
-                    var line: String? = bf.readLine()
-
-                    while (line != null) {
-                        stb.append(line + "\n")
-                        line = bf.readLine()
-                    }
-
-                    parseJSON(stb, mealsID)
-
-                    for (i in 0..mealsID.size - 1) {
-                        stb1.clear()
-                        temp.clear()
-                        var url_string2 = "https://www.themealdb.com/api/json/v1/1/lookup.php?i=${mealsID[i]}"
-                        val url = URL(url_string2)
+                        val url_string =
+                            "https://www.themealdb.com/api/json/v1/1/filter.php?i=$input_text"
+                        val url = URL(url_string)
                         val con: HttpURLConnection = url.openConnection() as HttpURLConnection
                         val bf = BufferedReader(InputStreamReader(con.inputStream))
                         var line: String? = bf.readLine()
+
                         while (line != null) {
-                            stb1.append(line + "\n")
-                            temp.append(line + "\n")
+                            stb.append(line + "\n")
                             line = bf.readLine()
                         }
-                        temp.delete(0,10)
 
-                        temp.deleteCharAt(temp.length-1)
-                        temp.deleteCharAt(temp.length-1)
-                        temp.deleteCharAt(temp.length-1)
+                        parseJSON(stb,mealsID)
 
-                        temp.append(",")
-                        stb2.append(temp)
+                        for (i in 0..mealsID.size - 1) {
+                            stb1.clear()
+                            temp.clear()
+                            var url_string2 =
+                                "https://www.themealdb.com/api/json/v1/1/lookup.php?i=${mealsID[i]}"
+                            val url = URL(url_string2)
+                            val con: HttpURLConnection = url.openConnection() as HttpURLConnection
+                            val bf = BufferedReader(InputStreamReader(con.inputStream))
+                            var line: String? = bf.readLine()
+                            while (line != null) {
+                                stb1.append(line + "\n")
+                                temp.append(line + "\n")
+                                line = bf.readLine()
+                            }
+                            temp.delete(0, 10)
 
+                            temp.deleteCharAt(temp.length - 1)
+                            temp.deleteCharAt(temp.length - 1)
+                            temp.deleteCharAt(temp.length - 1)
+
+                            temp.append(",")
+                            stb2.append(temp)
+
+                        }
+                        stb2.deleteCharAt(stb2.length - 1)
+                        stb2.append("]}")
+
+                        mealsView(stb2, linearLayout1)
                     }
-                    stb2.deleteCharAt(stb2.length -1)
-                    stb2.append("]}")
+                    progressBar.visibility = View.GONE
+                    scrollView1.addView(linearLayout1)
 
-                    mealsView(stb2,linearLayout1)
+                }catch (e: JSONException){
+                    progressBar.visibility = View.GONE
+                    Toast.makeText(this@SearchIngredient,"Type mismatch. Try again", Toast.LENGTH_SHORT).show()
+                        //coroutineContext.cancel()
+                    }
                 }
-            }
-            scrollView1.addView(linearLayout1)
-        }
 
-        save.setOnClickListener {
-            if(stb1.isNotEmpty()){
-                GlobalScope.launch(Dispatchers.IO){
+            }
+
+            save.setOnClickListener {
+
+                GlobalScope.launch(Dispatchers.IO) {
                     saveMeal(stb2)
+
                 }
+                Toast.makeText(this, "Successfully saved", Toast.LENGTH_SHORT).show()
             }
-            Toast.makeText(this, "Succes", Toast.LENGTH_SHORT).show()
         }
     }
 

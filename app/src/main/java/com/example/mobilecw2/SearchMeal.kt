@@ -3,9 +3,12 @@ package com.example.mobilecw2
 import android.graphics.*
 import android.os.Bundle
 import android.util.TypedValue
+import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import androidx.room.Room
 import kotlinx.coroutines.*
 import java.io.InputStream
@@ -28,18 +31,27 @@ class SearchMeal : AppCompatActivity() {
         val recipeDao = db.recipeDao()
         val search = findViewById<Button>(R.id.searchButton)
         search.setOnClickListener {
+
             linearLayout.removeAllViews()
             scrollView.removeAllViews()
             val input = findViewById<EditText>(R.id.inputText).text.toString()
             if (input != ""){
-                runBlocking {
+ // show the progress bar
+                GlobalScope.launch(Dispatchers.Main) {
+                    val proBar = findViewById<ProgressBar>(R.id.proBar)
+                    proBar.visibility = View.VISIBLE
                     withContext(Dispatchers.IO) {
                         val recipes: List<Recipe> = recipeDao.getRecipe(input)
                         updateUI(recipes,linearLayout)
                     }
+                    proBar.visibility = View.GONE
+                    scrollView.addView(linearLayout)
                 }
+
             }
-            scrollView.addView(linearLayout)
+            else{
+                Toast.makeText(this,"Field is empty",Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -59,6 +71,7 @@ class SearchMeal : AppCompatActivity() {
 
             var urlString = "${r.mealThumb}"
             val url = URL(urlString)
+
             val con: HttpURLConnection = url.openConnection() as HttpURLConnection
             val inputStream: InputStream = con.inputStream
             val bitmap = BitmapFactory.decodeStream(inputStream)
@@ -113,13 +126,46 @@ class SearchMeal : AppCompatActivity() {
 
             divider.text = "\t"
 
-            
-            linearLayout.addView(mealName)
-            linearLayout.addView(mealThumb)
-            linearLayout.addView(ing)
-            linearLayout.addView(ingMrs)
-            linearLayout.addView(inst)
-            linearLayout.addView(instructions)
+            // Create a new CardView instance
+            val cardView = CardView(this)
+            cardView.setCardBackgroundColor(ContextCompat.getColor(this, R.color.purple_700))
+
+// Set the layout parameters for the CardView
+            val params = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            params.setMargins(16, 16, 16, 16)
+            cardView.layoutParams = params
+
+// Set the CardView properties
+            cardView.radius = 25f
+            cardView.cardElevation = 15f
+            cardView.setContentPadding(16, 16, 16, 16)
+
+
+
+            // Create a new LinearLayout instance
+            val linearLayout1 = LinearLayout(this)
+
+// Set the orientation of the LinearLayout
+            linearLayout1.orientation = LinearLayout.VERTICAL
+
+// Set the layout parameters for the LinearLayout
+
+            linearLayout1.layoutParams = params
+
+            runOnUiThread {
+
+                linearLayout1.addView(mealName)
+                linearLayout1.addView(mealThumb)
+                linearLayout1.addView(ing)
+                linearLayout1.addView(ingMrs)
+                linearLayout1.addView(inst)
+                linearLayout1.addView(instructions)
+                cardView.addView(linearLayout1)
+                linearLayout.addView(cardView)
+            }
 
         }
 

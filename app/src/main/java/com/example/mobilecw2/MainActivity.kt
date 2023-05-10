@@ -1,6 +1,9 @@
 package com.example.mobilecw2
 
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
@@ -10,7 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import kotlin.properties.Delegates
+
 
 //Cut out q: where will be the database stored locally
 
@@ -22,25 +25,36 @@ class MainActivity : AppCompatActivity() {
         val db = Room.databaseBuilder(this, AppDatabase::class.java, "DB10").build()
         val recipeDao = db.recipeDao()
         val searchIngredient = findViewById<Button>(R.id.ingredientSearch)
+
         searchIngredient.setOnClickListener {
-            val contactIntent = Intent(this, SearchIngredient::class.java)
-            startActivity(contactIntent)
+            if (isInternetAvailable(this)) {
+                val contactIntent = Intent(this, SearchIngredient::class.java)
+                startActivity(contactIntent)
+            }
+            else{
+                Toast.makeText(this, "Please connect to the internet", Toast.LENGTH_SHORT).show()
+
+            }
         }
         val searchMeals = findViewById<Button>(R.id.mealSearch)
         searchMeals.setOnClickListener {
-            runBlocking {
-                launch {
-                    withContext(Dispatchers.IO){
-                        count = recipeDao.getCount()
+            if (isInternetAvailable(this)) {
+                runBlocking {
+                    launch {
+                        withContext(Dispatchers.IO) {
+                            count = recipeDao.getCount()
+                        }
                     }
                 }
-            }
-            if (count==0){
-                Toast.makeText(this, "No recipe found", Toast.LENGTH_SHORT).show()
+                if (count == 0) {
+                    Toast.makeText(this, "No recipe found", Toast.LENGTH_SHORT).show()
+                } else {
+                    val contactIntent = Intent(this, SearchMeal::class.java)
+                    startActivity(contactIntent)
+                }
             }
             else{
-                val contactIntent = Intent(this, SearchMeal::class.java)
-                startActivity(contactIntent)
+                Toast.makeText(this, "Please connect to the internet", Toast.LENGTH_SHORT).show()
             }
         }
         val saveBtn = findViewById<Button>(R.id.add)
@@ -97,5 +111,17 @@ class MainActivity : AppCompatActivity() {
                 }
             Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show()
             }
+
+        val srch = findViewById<Button>(R.id.btn)
+        srch.setOnClickListener {
+                val intent =Intent(this, SearchWeb::class.java)
+                startActivity(intent)
+            }
         }
+    fun isInternetAvailable(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork ?: return false
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+        return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    }
 }

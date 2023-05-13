@@ -4,58 +4,63 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FF118675"
-
+    android:background="@color/lightgreen"
     tools:context=".MainActivity">
 
     <Button
         android:id="@+id/mealSearch"
-        android:layout_width="295dp"
-        android:layout_height="60dp"
+        android:layout_width="315dp"
+        android:layout_height="70dp"
         android:text="Search for Meals"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.593"
-        />
+        app:layout_constraintVertical_bias="0.59"
+        app:shapeAppearance="@style/ShapeAppearance" />
 
     <Button
         android:id="@+id/ingredientSearch"
-        android:layout_width="295dp"
-        android:layout_height="60dp"
+        android:layout_width="315dp"
+        android:layout_height="70dp"
         android:text="Search by ingredient"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.721" />
+        app:layout_constraintVertical_bias="0.711"
+        app:shapeAppearance="@style/ShapeAppearance" />
 
     <Button
         android:id="@+id/add"
-        android:layout_width="295dp"
-        android:layout_height="60dp"
+        android:layout_width="315dp"
+        android:layout_height="70dp"
         android:text="Add to DB"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.847" />
+        app:layout_constraintVertical_bias="0.833"
+        app:shapeAppearance="@style/ShapeAppearance" />
 
     <TextView
         android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="500dp"
+        android:layout_height="80dp"
+
+        android:elevation="10dp"
         android:fontFamily="cursive"
         android:text="• Recipe hunt •"
-        android:textColor="#CCEA56"
+        android:textAlignment="center"
+        android:textColor="#70C972"
         android:textSize="55dp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.505"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.163" />
+        app:layout_constraintVertical_bias="0.064" />
 
     <ImageView
         android:id="@+id/imageView3"
@@ -65,19 +70,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.353"
+        app:layout_constraintVertical_bias="0.269"
         app:srcCompat="@drawable/logo" />
 
     <Button
         android:id="@+id/btn"
-        android:layout_width="299dp"
-        android:layout_height="60dp"
+        android:layout_width="315dp"
+        android:layout_height="70dp"
         android:text="Button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.479"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.963" />
+        app:layout_constraintVertical_bias="0.953"
+        app:shapeAppearance="@style/ShapeAppearance" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

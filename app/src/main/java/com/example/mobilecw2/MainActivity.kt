@@ -6,6 +6,8 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.Toast
 import androidx.room.Room
@@ -21,7 +23,9 @@ class MainActivity : AppCompatActivity() {
     var count :Int = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        supportActionBar?.hide()
         setContentView(R.layout.activity_main)
+
         val db = Room.databaseBuilder(this, AppDatabase::class.java, "DB10").build()
         val recipeDao = db.recipeDao()
         val searchIngredient = findViewById<Button>(R.id.ingredientSearch)

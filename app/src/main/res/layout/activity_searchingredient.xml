@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FF118675"
+    android:background="@color/lightgreen"
     tools:context=".SearchIngredient">
 
     <ProgressBar
@@ -18,56 +18,61 @@
         app:layout_constraintTop_toTopOf="parent"
         android:visibility="invisible"
         android:indeterminate="true"
-        android:indeterminateTint="@color/white"
+        android:indeterminateTint="@color/green"
         android:indeterminateTintMode="src_in" />
+
 
     <Button
         android:id="@+id/retrieveBtn"
-        android:layout_width="108dp"
-        android:layout_height="49dp"
+        android:layout_width="116dp"
+        android:layout_height="55dp"
         android:text="Retrieve"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.726"
+        app:layout_constraintHorizontal_bias="0.75"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.036" />
+        app:layout_constraintVertical_bias="0.038"
+        app:shapeAppearance="@style/ShapeAppearance" />
 
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/input"
-        android:layout_width="195dp"
-        android:layout_height="49dp"
-        android:textColor="@color/white"
+        android:layout_width="193dp"
+        android:layout_height="43dp"
+        android:background="@drawable/searchbar"
+        android:drawableLeft="@drawable/s"
+        android:textColor="@color/darkgreen"
+        android:elevation="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.06"
+        app:layout_constraintHorizontal_bias="0.073"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.036" />
+        app:layout_constraintVertical_bias="0.045" />
 
     <ImageButton
         android:id="@+id/saveMeals"
-        android:layout_width="50dp"
-        android:layout_height="49dp"
+        android:layout_width="58dp"
+        android:layout_height="61dp"
         android:background="@drawable/save"
         android:text="Save meals"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.95"
+        app:layout_constraintHorizontal_bias="0.97"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.036" />
+        app:layout_constraintVertical_bias="0.034"
+        app:shapeAppearance="@style/ImageButtonStyle" />
 
     <ScrollView
         android:id="@+id/sv1"
-        android:layout_width="375dp"
-        android:layout_height="500dp"
+        android:layout_width="382dp"
+        android:layout_height="560dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.361"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.715">
+        app:layout_constraintVertical_bias="0.965">
 
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

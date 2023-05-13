@@ -1,5 +1,6 @@
 package com.example.mobilecw2
 
+import android.app.Activity
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
@@ -24,8 +25,9 @@ class SearchIngredient: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        supportActionBar?.hide()
         setContentView(R.layout.activity_searchingredient)
-
+        val ct = CoroutineTasks()
         val retrieveBtn = findViewById<Button>(R.id.retrieveBtn)
         val save = findViewById<ImageButton>(R.id.saveMeals)
 
@@ -72,7 +74,7 @@ class SearchIngredient: AppCompatActivity() {
                             line = bf.readLine()
                         }
 
-                        parseJSON(stb,mealsID)
+                        mealsRetrieve(stb,mealsID)
 
                         for (i in 0..mealsID.size - 1) {
                             stb1.clear()
@@ -90,9 +92,7 @@ class SearchIngredient: AppCompatActivity() {
                             }
                             temp.delete(0, 10)
 
-                            temp.deleteCharAt(temp.length - 1)
-                            temp.deleteCharAt(temp.length - 1)
-                            temp.deleteCharAt(temp.length - 1)
+                            temp.setLength(temp.length - 3)
 
                             temp.append(",")
                             stb2.append(temp)
@@ -101,24 +101,25 @@ class SearchIngredient: AppCompatActivity() {
                         stb2.deleteCharAt(stb2.length - 1)
                         stb2.append("]}")
 
-                        mealsView(stb2, linearLayout1)
+                        ct.mealsView(stb2, linearLayout1,this@SearchIngredient)
                     }
                     progressBar.visibility = View.GONE
                     scrollView1.addView(linearLayout1)
 
                 }catch (e: JSONException){
                     progressBar.visibility = View.GONE
-                    Toast.makeText(this@SearchIngredient,"Type mismatch. Try again", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@SearchIngredient,"Couldn't find related recipes", Toast.LENGTH_SHORT).show()
                         //coroutineContext.cancel()
                     }
                 }
 
             }
 
+
             save.setOnClickListener {
 
                 GlobalScope.launch(Dispatchers.IO) {
-                    saveMeal(stb2)
+                    ct.saveMeal(stb2,this@SearchIngredient)
 
                 }
                 Toast.makeText(this, "Successfully saved", Toast.LENGTH_SHORT).show()
@@ -126,8 +127,7 @@ class SearchIngredient: AppCompatActivity() {
         }
     }
 
-
-    suspend fun parseJSON(stb: java.lang.StringBuilder, mealsID: MutableList<Int>) {
+    fun mealsRetrieve(stb: java.lang.StringBuilder, mealsID: MutableList<Int>) {
         val json = JSONObject(stb.toString())
 
         var jsonArray: JSONArray = json.getJSONArray("meals")
@@ -139,123 +139,7 @@ class SearchIngredient: AppCompatActivity() {
         }
     }
 
-    suspend fun mealsView(stb2: java.lang.StringBuilder,linearLayout1: LinearLayout){
-        val json = JSONObject(stb2.toString())
-        val jsonArray: JSONArray = json.getJSONArray("meals")
 
-        for (i in 0..jsonArray.length()-1) {
-            val meal: JSONObject = jsonArray[i] as JSONObject // this is a json object
-            val idMeal = meal["idMeal"].toString().toInt()
-            val strMeal = meal["strMeal"].toString()
-            val drinkAlt = meal["strDrinkAlternate"].toString()
-            val category = meal["strCategory"].toString()
-            val area = meal["strArea"].toString()
-            val instructions = meal["strInstructions"].toString()
-            val mealThumb = meal["strMealThumb"].toString()
-            val tags = meal["strTags"].toString()
-            val youtube = meal["strYoutube"].toString()
-            val ingredients = mutableListOf<String>()
-            val measures = mutableListOf<String>()
-            //ingredients.add(jsonObject.toString())
-            val keysIterator = meal.keys()
-            while (keysIterator.hasNext()) {
-                val key = keysIterator.next()
-                //ingredients.add(key)
-                if (key.startsWith("strIngredient")) {
-                    ingredients.add(meal.getString(key))
-                } else if (key.startsWith("strMeasure")) {
-                    measures.add(meal.getString(key))
-                }
-            }
-            val src = meal["strSource"].toString()
-            val imgSrc = meal["strImageSource"].toString()
-            val creativeCommonsConfirmed = meal["strCreativeCommonsConfirmed"].toString()
-            val dateModified = meal["dateModified"].toString()
 
-            val mealName = TextView(this)
-            val desc = TextView(this)
-            val ing = TextView(this)
-            val ingMrs = TextView(this)
-            val instTitle = TextView(this)
-            val inst = TextView(this)
-            mealName.text = "${i+1}. $strMeal"
-            mealName.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20F)
-            mealName.setTextColor(Color.WHITE)
-            mealName.setTypeface(null, Typeface.BOLD)
-
-            desc.text = "Drink alternate: $drinkAlt\nCategory: $category\nArea: $area\n\n"
-            desc.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15F)
-            desc.setTextColor(Color.WHITE)
-
-            ing.text = "\nIngredients & Measures"
-            ing.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15F)
-            ing.setTextColor(Color.WHITE)
-            ing.setTypeface(null, Typeface.BOLD)
-
-            for (i in 0 until (ingredients?.size ?: 0)) {
-                ingMrs.append("${ingredients?.get(i)}-${measures?.get(i)}, ")
-            }
-            ingMrs.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15F)
-            ingMrs.setTextColor(Color.WHITE)
-
-            instTitle.text = "\nInstructions"
-            instTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15F)
-            instTitle.setTextColor(Color.WHITE)
-            instTitle.setTypeface(null, Typeface.BOLD)
-
-            inst.text = "$instructions\n"
-            inst.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15F)
-            inst.setTextColor(Color.WHITE)
-
-            //linearLayout.addView(mealThumb)
-            linearLayout1.addView(mealName)
-            linearLayout1.addView(ing)
-            linearLayout1.addView(ingMrs)
-            linearLayout1.addView(instTitle)
-            linearLayout1.addView(inst)
-        }
-    }
-
-    suspend fun saveMeal(stb2: java.lang.StringBuilder){
-        val db = Room.databaseBuilder(this, AppDatabase::class.java, "DB10").build()
-        val recipeDao = db.recipeDao()
-        val json = JSONObject(stb2.toString())
-
-        val jsonArray: JSONArray = json.getJSONArray("meals")
-
-        for (i in 0..jsonArray.length()-1) {
-            val meal: JSONObject = jsonArray[i] as JSONObject // this is a json object
-            val idMeal = meal["idMeal"].toString().toInt()
-            val strMeal = meal["strMeal"].toString()
-            val drinkAlt = meal["strDrinkAlternate"].toString()
-            val category = meal["strCategory"].toString()
-            val area = meal["strArea"].toString()
-            val instructions = meal["strInstructions"].toString()
-            val mealThumb = meal["strMealThumb"].toString()
-            val tags = meal["strTags"].toString()
-            val youtube = meal["strYoutube"].toString()
-            val ingredients = mutableListOf<String>()
-            val measures = mutableListOf<String>()
-            val keysIterator = meal.keys()
-            while (keysIterator.hasNext()) {
-                val key = keysIterator.next()
-                if (key.startsWith("strIngredient")) {
-                    ingredients.add(meal.getString(key))
-                } else if (key.startsWith("strMeasure")) {
-                    measures.add(meal.getString(key))
-                }
-            }
-            val src = meal["strSource"].toString()
-            val imgSrc = meal["strImageSource"].toString()
-            val creativeCommonsConfirmed = meal["strCreativeCommonsConfirmed"].toString()
-            val dateModified = meal["dateModified"].toString()
-
-            val recipe = Recipe(id = idMeal,meal=strMeal, drinkAlternate = drinkAlt,category=category,
-                area = area, instructions = instructions,mealThumb=mealThumb,tags=tags, youtube = youtube,ingredients=ingredients,
-                measures = measures, src = src, imgSrc = imgSrc, CreativeCommonsConfirmed = creativeCommonsConfirmed, dateModified = dateModified)
-            recipeDao.insertRecipe(recipe)
-        }
-
-    }
 
 }
